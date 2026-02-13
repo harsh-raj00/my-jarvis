@@ -459,7 +459,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 ---
 
 <p align="center">
-  <sub>Built with ❤️ and a lot of ☕ by a Tony Stark fan</sub>
+  <sub>Built with ❤️ and a lot of ☕ by a Tony Stark fan(Harsh Raj)</sub>
   <br>
   <sub>
     <em>"Sometimes you gotta run before you can walk."</em> — Tony Stark
