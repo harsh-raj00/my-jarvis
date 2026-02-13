@@ -189,7 +189,7 @@ When you activate voice, a stunning **full-screen popup** appears:
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/harsh-raj00/jarvis-ai.git
+git clone https://github.com/harsh-raj00/my-jarvis
 cd jarvis-ai
 ```
 
