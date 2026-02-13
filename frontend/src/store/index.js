@@ -7,7 +7,7 @@ export const useStore = create(
       // Theme
       theme: 'dark',
       setTheme: (theme) => set({ theme }),
-      
+
       // User Preferences
       preferences: {
         voiceEnabled: true,
@@ -17,15 +17,15 @@ export const useStore = create(
         language: 'en-US'
       },
       setPreferences: (preferences) => set({ preferences }),
-      
+
       // Conversations
       conversations: [],
-      addConversation: (conversation) => 
-        set(state => ({ 
-          conversations: [conversation, ...state.conversations.slice(0, 99)] 
+      addConversation: (conversation) =>
+        set(state => ({
+          conversations: [conversation, ...state.conversations.slice(0, 99)]
         })),
       clearConversations: () => set({ conversations: [] }),
-      
+
       // Plugins
       plugins: [],
       setPlugins: (plugins) => set({ plugins }),
@@ -35,30 +35,30 @@ export const useStore = create(
             plugin.id === pluginId ? { ...plugin, enabled } : plugin
           )
         })),
-      
+
       // System Settings
       settings: {
         apiKey: '',
-        endpoint: 'http://localhost:8000',
+        endpoint: import.meta.env.VITE_API_URL || 'http://localhost:8000',
         maxTokens: 1000,
         temperature: 0.7
       },
       setSettings: (settings) => set({ settings }),
-      
+
       // UI State
       isLoading: false,
       setIsLoading: (isLoading) => set({ isLoading }),
-      
+
       notifications: [],
       addNotification: (notification) =>
-        set(state => ({ 
+        set(state => ({
           notifications: [...state.notifications, notification].slice(0, 5)
         })),
       removeNotification: (id) =>
         set(state => ({
           notifications: state.notifications.filter(n => n.id !== id)
         })),
-      
+
       // Clear all data
       clearAll: () => set({
         conversations: [],
@@ -99,7 +99,7 @@ export const store = {
   dispatch: ({ type, payload }) => {
     // This gets the current state of your Zustand store
     const state = useStore.getState();
-    
+
     // This maps the Redux-style calls to your Zustand functions
     if (type === 'SET_LOADING') {
       state.setIsLoading(payload);

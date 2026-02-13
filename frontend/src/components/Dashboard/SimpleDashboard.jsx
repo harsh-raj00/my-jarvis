@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Cpu, Zap, MessageCircle, Settings } from 'lucide-react'
+import config from '../../config'
 
 export default function SimpleDashboard() {
   const [messages, setMessages] = useState([
@@ -17,7 +18,7 @@ export default function SimpleDashboard() {
   useEffect(() => {
     const fetchHealth = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/v1/system/health')
+        const response = await fetch(`${config.API_URL}/system/health`)
         const data = await response.json()
         setSystemInfo({
           cpu: `${data.cpu_usage?.toFixed(1) || '0'}%`,
@@ -46,7 +47,7 @@ export default function SimpleDashboard() {
     setStatus('thinking')
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/chat', {
+      const response = await fetch(`${config.API_URL}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: input })
@@ -124,7 +125,7 @@ export default function SimpleDashboard() {
           {/* Info Box */}
           <div className="m-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
             <p className="text-xs text-gray-400 font-mono">
-              <span className="text-blue-400">Backend:</span> http://localhost:8000
+              <span className="text-blue-400">Backend:</span> {config.BASE_URL}
             </p>
             <p className="text-xs text-gray-400 font-mono mt-1">
               <span className="text-blue-400">Frontend:</span> http://localhost:3000
@@ -142,13 +143,12 @@ export default function SimpleDashboard() {
                 className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-md px-4 py-3 rounded-lg ${
-                    msg.sender === 'user'
+                  className={`max-w-md px-4 py-3 rounded-lg ${msg.sender === 'user'
                       ? 'bg-blue-600 text-white'
                       : msg.sender === 'error'
-                      ? 'bg-red-500/20 border border-red-500/50 text-red-100'
-                      : 'bg-gray-800 text-gray-100'
-                  }`}
+                        ? 'bg-red-500/20 border border-red-500/50 text-red-100'
+                        : 'bg-gray-800 text-gray-100'
+                    }`}
                 >
                   <p className="text-sm">{msg.text}</p>
                   <p className="text-xs mt-1 opacity-70">{msg.time}</p>

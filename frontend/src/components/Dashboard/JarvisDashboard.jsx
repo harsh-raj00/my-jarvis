@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react'
 import { Volume2, VolumeX, Send, Mic, MicOff, Cpu, HardDrive, Wifi, WifiOff, Square } from 'lucide-react'
 import VoiceOrb from '../UI/VoiceOrb'
+import config from '../../config'
 
 // Lazy load 3D scene
 const JarvisScene = lazy(() => import('../3D/JarvisScene').catch(err => {
@@ -100,7 +101,7 @@ const JarvisDashboard = () => {
     useEffect(() => {
         const checkBackend = async () => {
             try {
-                const res = await fetch('http://localhost:8000/api/v1/health')
+                const res = await fetch(`${config.API_URL}/health`)
                 setBackendStatus(res.ok ? 'online' : 'offline')
             } catch {
                 setBackendStatus('offline')
@@ -116,7 +117,7 @@ const JarvisDashboard = () => {
         const fetchMetrics = async () => {
             if (backendStatus !== 'online') return
             try {
-                const res = await fetch('http://localhost:8000/api/v1/system/health')
+                const res = await fetch(`${config.API_URL}/system/health`)
                 if (res.ok) {
                     const d = await res.json()
                     setSystemMetrics({ cpu: d.cpu_usage || 0, memory: d.memory_usage || 0, disk: d.disk_usage || 0 })
@@ -209,7 +210,7 @@ const JarvisDashboard = () => {
         setVoiceState('processing')
 
         try {
-            const res = await fetch('http://localhost:8000/api/v1/chat', {
+            const res = await fetch(`${config.API_URL}/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: voiceText })
@@ -239,7 +240,7 @@ const JarvisDashboard = () => {
         setVoiceState('processing')
 
         try {
-            const res = await fetch('http://localhost:8000/api/v1/chat', {
+            const res = await fetch(`${config.API_URL}/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: input })

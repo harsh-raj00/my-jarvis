@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Volume2, VolumeX, Send, Zap } from 'lucide-react'
+import config from '../../config'
 
 export default function EnhancedDashboard() {
   const [messages, setMessages] = useState([])
@@ -22,7 +23,7 @@ export default function EnhancedDashboard() {
   useEffect(() => {
     const checkBackend = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/v1/health')
+        const res = await fetch(`${config.API_URL}/health`)
         setBackendStatus(res.ok ? 'online' : 'offline')
       } catch {
         setBackendStatus('offline')
@@ -37,7 +38,7 @@ export default function EnhancedDashboard() {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/v1/system/health')
+        const res = await fetch(`${config.API_URL}/system/health`)
         if (res.ok) {
           const d = await res.json()
           setSystemMetrics({ cpu: d.cpu_usage, memory: d.memory_usage, disk: d.disk_usage, timestamp: new Date() })
@@ -73,7 +74,7 @@ export default function EnhancedDashboard() {
     setLoading(true)
 
     try {
-      const res = await fetch('http://localhost:8000/api/v1/chat', {
+      const res = await fetch(`${config.API_URL}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: input })
@@ -84,7 +85,7 @@ export default function EnhancedDashboard() {
       const response = data.response || data.message || 'Processing...'
 
       setMessages(prev => [...prev, { role: 'assistant', text: response, id: Date.now() + 1 }])
-      
+
       // Speak response
       await speak(response)
     } catch (e) {
@@ -195,7 +196,7 @@ export default function EnhancedDashboard() {
               {loading && (
                 <div style={{ display: 'flex' }}>
                   <div style={{ padding: '10px 14px', background: 'rgba(212, 175, 55, 0.1)', borderRadius: '8px', display: 'flex', gap: '4px' }}>
-                    {[0,1,2].map(i => (
+                    {[0, 1, 2].map(i => (
                       <div key={i} style={{
                         width: '6px', height: '6px', borderRadius: '50%', background: '#ffd700',
                         animation: 'pulse 1.5s infinite', animationDelay: `${i * 0.2}s`
@@ -270,9 +271,9 @@ export default function EnhancedDashboard() {
             <p style={{ fontSize: '18px', fontWeight: 'bold', margin: '0 0 8px 0' }}>SUIT DIAGNOSTICS</p>
             <p style={{ fontSize: '12px', color: '#888', margin: 0 }}>Arc Reactor: 100% • Systems: Nominal • Suits Active: 8</p>
             <div style={{ marginTop: '20px', padding: '12px', background: 'rgba(212, 175, 55, 0.1)', borderRadius: '4px', fontSize: '11px', fontFamily: 'monospace' }}>
-              ▓▓▓▓▓▓▓▓▓▓  Power Cores 100%<br/>
-              ▓▓▓▓▓░░░░░  Armor Integrity 50%<br/>
-              ▓▓▓▓▓▓▓▓░░  Repulsor Charge 80%<br/>
+              ▓▓▓▓▓▓▓▓▓▓  Power Cores 100%<br />
+              ▓▓▓▓▓░░░░░  Armor Integrity 50%<br />
+              ▓▓▓▓▓▓▓▓░░  Repulsor Charge 80%<br />
               ▓▓▓▓▓▓▓▓▓▓  Energy Stable
             </div>
           </div>

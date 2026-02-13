@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { store } from '../store'
+import config from '../config'
 
 // Create axios instance
 // export const jarvisAPI = axios.create({
@@ -13,7 +14,7 @@ import { store } from '../store'
 
 export const jarvisAPI = axios.create({
   // Use the v1 prefix so chat, speech, and plugins work automatically
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1', 
+  baseURL: config.API_URL,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -26,19 +27,19 @@ jarvisAPI.interceptors.request.use(
   (config) => {
     // Add loading state
     store.dispatch({ type: 'SET_LOADING', payload: true })
-    
+
     // Add timestamp
     config.metadata = { startTime: new Date() }
-    
+
     // Add auth token if available
     const token = localStorage.getItem('jarvis_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
-    
+
     // Log request
     console.log(`🚀 ${config.method?.toUpperCase()} ${config.url}`, config.data || '')
-    
+
     return config
   },
   (error) => {
@@ -53,22 +54,22 @@ jarvisAPI.interceptors.response.use(
     const endTime = new Date()
     const startTime = response.config.metadata?.startTime
     const duration = startTime ? endTime - startTime : 0
-    
+
     store.dispatch({ type: 'SET_LOADING', payload: false })
-    
+
     console.log(`✅ ${response.config.method?.toUpperCase()} ${response.config.url} - ${duration}ms`, response.data)
-    
+
     return response
   },
   (error) => {
     store.dispatch({ type: 'SET_LOADING', payload: false })
-    
+
     const endTime = new Date()
     const startTime = error.config?.metadata?.startTime
     const duration = startTime ? endTime - startTime : 0
-    
+
     console.error(`❌ ${error.config?.method?.toUpperCase()} ${error.config?.url} - ${duration}ms`, error.response?.data || error.message)
-    
+
     // Handle specific errors
     if (error.response?.status === 401) {
       // Unauthorized - clear token and redirect
@@ -108,7 +109,7 @@ jarvisAPI.interceptors.response.use(
         }
       })
     }
-    
+
     return Promise.reject(error)
   }
 )
@@ -125,14 +126,14 @@ class WebSocketService {
 
   connect() {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const baseUrl = import.meta.env.VITE_WS_URL || 'localhost:8000'
-    
-    this.socket = new WebSocket(`${protocol}//${baseUrl}/ws`)
-    
+    const baseUrl = config.WS_URL
+
+    this.socket = new WebSocket(baseUrl)
+
     this.socket.onopen = () => {
       console.log('🔗 WebSocket connected')
       this.reconnectAttempts = 0
-      
+
       store.dispatch({
         type: 'ADD_NOTIFICATION',
         payload: {
@@ -143,7 +144,7 @@ class WebSocketService {
         }
       })
     }
-    
+
     this.socket.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data)
@@ -152,10 +153,10 @@ class WebSocketService {
         console.error('Failed to parse WebSocket message:', error)
       }
     }
-    
+
     this.socket.onclose = () => {
       console.log('🔌 WebSocket disconnected')
-      
+
       if (this.reconnectAttempts < this.maxReconnectAttempts) {
         setTimeout(() => {
           this.reconnectAttempts++
@@ -165,24 +166,24 @@ class WebSocketService {
         }, this.reconnectDelay)
       }
     }
-    
+
     this.socket.onerror = (error) => {
       console.error('WebSocket error:', error)
     }
   }
-  
+
   emit(type, payload) {
     const listeners = this.listeners.get(type) || []
     listeners.forEach(callback => callback(payload))
   }
-  
+
   on(type, callback) {
     if (!this.listeners.has(type)) {
       this.listeners.set(type, [])
     }
     this.listeners.get(type).push(callback)
   }
-  
+
   off(type, callback) {
     if (this.listeners.has(type)) {
       const listeners = this.listeners.get(type)
@@ -192,13 +193,13 @@ class WebSocketService {
       }
     }
   }
-  
+
   send(type, payload) {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify({ type, payload }))
     }
   }
-  
+
   disconnect() {
     if (this.socket) {
       this.socket.close()
@@ -211,18 +212,18 @@ export const wsService = new WebSocketService()
 
 // API Functions
 export const chatAPI = {
-  sendMessage: (message, sessionId = null) => 
+  sendMessage: (message, sessionId = null) =>
     jarvisAPI.post('/chat', { message, session_id: sessionId }),
-  
-  getHistory: (limit = 50) => 
+
+  getHistory: (limit = 50) =>
     jarvisAPI.get(`/chat/history?limit=${limit}`),
-  
-  clearHistory: () => 
+
+  clearHistory: () =>
     jarvisAPI.delete('/chat/history'),
-  
+
   streamResponse: (message, onChunk, onComplete) => {
     const eventSource = new EventSource(`${jarvisAPI.defaults.baseURL}/chat/stream?message=${encodeURIComponent(message)}`)
-    
+
     eventSource.onmessage = (event) => {
       if (event.data === '[DONE]') {
         eventSource.close()
@@ -232,12 +233,12 @@ export const chatAPI = {
         onChunk?.(data.text)
       }
     }
-    
+
     eventSource.onerror = (error) => {
       console.error('SSE Error:', error)
       eventSource.close()
     }
-    
+
     return () => eventSource.close()
   }
 }
@@ -250,73 +251,73 @@ export const speechAPI = {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
   },
-  
+
   textToSpeech: (text, voice = 'jarvis') =>
     jarvisAPI.post('/speech/synthesize', { text, voice }),
-  
+
   getVoices: () =>
     jarvisAPI.get('/speech/voices')
 }
 
 export const pluginAPI = {
   getAll: () => jarvisAPI.get('/plugins'),
-  
+
   get: (id) => jarvisAPI.get(`/plugins/${id}`),
-  
-  toggle: (id, enabled) => 
+
+  toggle: (id, enabled) =>
     jarvisAPI.put(`/plugins/${id}/toggle`, { enabled }),
-  
+
   install: (pluginUrl) =>
     jarvisAPI.post('/plugins/install', { url: pluginUrl }),
-  
+
   uninstall: (id) =>
     jarvisAPI.delete(`/plugins/${id}`),
-  
+
   updateConfig: (id, config) =>
     jarvisAPI.put(`/plugins/${id}/config`, config)
 }
 
 export const skillsAPI = {
   getAll: () => jarvisAPI.get('/skills'),
-  
+
   get: (name) => jarvisAPI.get(`/skills/${name}`),
-  
-  toggle: (name, enable) => 
+
+  toggle: (name, enable) =>
     jarvisAPI.post(`/skills/${name}/toggle`, { enable }),
-  
+
   getAvailable: () => jarvisAPI.get('/skills/available')
 }
 
 export const systemAPI = {
   getHealth: () => jarvisAPI.get('/system/health'),
-  
+
   getMetrics: () => jarvisAPI.get('/system/metrics'),
-  
+
   getLogs: (limit = 100) => jarvisAPI.get(`/system/logs?limit=${limit}`),
-  
+
   clearLogs: () => jarvisAPI.delete('/system/logs'),
-  
+
   restart: () => jarvisAPI.post('/system/restart'),
-  
+
   shutdown: () => jarvisAPI.post('/system/shutdown'),
-  
+
   update: () => jarvisAPI.post('/system/update')
 }
 
 export const userAPI = {
   login: (credentials) => jarvisAPI.post('/auth/login', credentials),
-  
+
   register: (userData) => jarvisAPI.post('/auth/register', userData),
-  
+
   getProfile: () => jarvisAPI.get('/user/profile'),
-  
+
   updateProfile: (profile) => jarvisAPI.put('/user/profile', profile),
-  
-  changePassword: (passwords) => 
+
+  changePassword: (passwords) =>
     jarvisAPI.put('/user/password', passwords),
-  
+
   getPreferences: () => jarvisAPI.get('/user/preferences'),
-  
+
   updatePreferences: (preferences) =>
     jarvisAPI.put('/user/preferences', preferences)
 }
@@ -325,7 +326,7 @@ export const userAPI = {
 export const uploadFile = async (file, onProgress) => {
   const formData = new FormData()
   formData.append('file', file)
-  
+
   return jarvisAPI.post('/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress: (progressEvent) => {

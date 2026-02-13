@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import config from '../../config'
 
 export default function StandaloneDashboard() {
   const [messages, setMessages] = useState([])
@@ -24,7 +25,7 @@ export default function StandaloneDashboard() {
   useEffect(() => {
     const checkBackend = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/v1/health')
+        const res = await fetch(`${config.API_URL}/health`)
         if (res.ok) {
           setBackendStatus('online')
         }
@@ -42,7 +43,7 @@ export default function StandaloneDashboard() {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const res = await fetch('http://localhost:8000/api/v1/system/health')
+        const res = await fetch(`${config.API_URL}/system/health`)
         if (res.ok) {
           const data = await res.json()
           setSystemMetrics({
@@ -72,7 +73,7 @@ export default function StandaloneDashboard() {
     setLoading(true)
 
     try {
-      const res = await fetch('http://localhost:8000/api/v1/chat', {
+      const res = await fetch(`${config.API_URL}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: input })
