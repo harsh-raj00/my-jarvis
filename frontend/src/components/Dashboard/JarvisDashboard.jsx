@@ -248,7 +248,6 @@ const JarvisDashboard = () => {
         setMessages(prev => [...prev, userMsg])
         setInput('')
         setLoading(true)
-        setVoiceState('processing')
 
         try {
             const res = await fetch(`${config.API_URL}/chat`, {
@@ -260,10 +259,9 @@ const JarvisDashboard = () => {
             const data = await res.json()
             const response = data.response || data.message || 'Processing...'
             setMessages(prev => [...prev, { role: 'assistant', text: response, id: Date.now() + 1 }])
-            await speak(response)
+            if (audioEnabled) await speak(response)
         } catch (e) {
             setMessages(prev => [...prev, { role: 'error', text: `Error: ${e.message}`, id: Date.now() + 1 }])
-            setVoiceState('idle')
         } finally {
             setLoading(false)
         }
