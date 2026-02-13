@@ -217,10 +217,7 @@
 }
 
 .voice-orb-ring.listening {
-    border: 2px solid;
-    border-image: linear-gradient(135deg, #ff2d55, #ff6ec7, #a855f7) 1;
-    border-radius: 50%;
-    border-color: rgba(255, 45, 85, 0.5);
+    border: 2px solid rgba(255, 45, 85, 0.5);
 }
 
 .voice-orb-ring.processing {
