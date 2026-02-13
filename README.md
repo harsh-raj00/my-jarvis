@@ -16,6 +16,11 @@
 </p>
 
 <p align="center">
+  <a href="https://jarvis-frontend-uj30.onrender.com"><img src="https://img.shields.io/badge/🚀_Live_Demo-jarvis--frontend-00E5B0?style=for-the-badge" alt="Live Demo"/></a>
+  <a href="https://jarvis-backend-cybf.onrender.com/docs"><img src="https://img.shields.io/badge/📡_API_Docs-Swagger-blue?style=for-the-badge" alt="API Docs"/></a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/React-18.2-61DAFB?style=flat-square&logo=react&logoColor=white" alt="React"/>
   <img src="https://img.shields.io/badge/Three.js-0.158-black?style=flat-square&logo=threedotjs&logoColor=white" alt="Three.js"/>
   <img src="https://img.shields.io/badge/FastAPI-0.109-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI"/>
