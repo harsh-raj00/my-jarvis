@@ -55,12 +55,23 @@ const JarvisDashboard = () => {
                 }
 
                 if (finalTranscript) {
-                    setTranscript(finalTranscript)
-                    setInput(finalTranscript)
-                    // Auto-send after getting final result
-                    setTimeout(() => {
-                        handleVoiceSubmit(finalTranscript)
-                    }, 300)
+                    const cleanTranscript = finalTranscript.trim()
+
+                    // Check for wake word "Jarvis"
+                    if (cleanTranscript.toLowerCase().startsWith('jarvis')) {
+                        // Strip wake word and process command
+                        const command = cleanTranscript.substring(6).trim()
+                        if (command) {
+                            setTranscript(finalTranscript) // Show full transcript briefly
+                            setInput(command)
+                            setTimeout(() => {
+                                handleVoiceSubmit(command)
+                            }, 300)
+                        }
+                    } else {
+                        console.log('Ignored: No wake word', cleanTranscript)
+                        setTranscript(cleanTranscript) // Show what was heard but don't process
+                    }
                 } else if (interimTranscript) {
                     setTranscript(interimTranscript)
                 }
