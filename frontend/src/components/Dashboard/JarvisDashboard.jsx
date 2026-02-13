@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense, lazy } from 'react'
-import { Volume2, VolumeX, Send, Mic, MicOff, Cpu, HardDrive, Wifi, WifiOff } from 'lucide-react'
+import { Volume2, VolumeX, Send, Mic, MicOff, Cpu, HardDrive, Wifi, WifiOff, Square } from 'lucide-react'
 import VoiceOrb from '../UI/VoiceOrb'
 
 // Lazy load 3D scene
@@ -169,6 +169,14 @@ const JarvisDashboard = () => {
 
         window.speechSynthesis.speak(utterance)
     }, [audioEnabled])
+
+    // Stop speaking mid-speech
+    const stopSpeaking = useCallback(() => {
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel()
+        }
+        setVoiceState('idle')
+    }, [])
 
     // Start/Stop Voice Recognition
     const toggleVoiceRecognition = () => {
@@ -383,31 +391,52 @@ const JarvisDashboard = () => {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        <form onSubmit={handleSendMessage} style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '8px' }}>
-                            {/* Voice Button */}
-                            <button
-                                type="button"
-                                onClick={toggleVoiceRecognition}
-                                disabled={loading}
-                                style={{
-                                    padding: '12px',
-                                    borderRadius: '12px',
-                                    background: voiceState === 'listening' ? 'linear-gradient(135deg, #FF4444, #CC0000)' : 'rgba(0,229,176,0.2)',
-                                    color: voiceState === 'listening' ? '#FFF' : '#00E5B0',
-                                    border: voiceState === 'listening' ? '2px solid #FF4444' : '2px solid transparent',
-                                    cursor: 'pointer',
-                                    boxShadow: voiceState === 'listening' ? '0 0 20px rgba(255,68,68,0.5)' : 'none',
-                                    animation: voiceState === 'listening' ? 'pulse 1s infinite' : 'none',
-                                    transition: 'all 0.3s ease'
-                                }}
-                            >
-                                {voiceState === 'listening' ? <Mic size={20} /> : <MicOff size={20} />}
-                            </button>
+                        <form onSubmit={handleSendMessage} style={{ padding: '16px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            {/* Voice / Stop Button */}
+                            {voiceState === 'speaking' ? (
+                                <button
+                                    type="button"
+                                    onClick={stopSpeaking}
+                                    title="Stop Jarvis"
+                                    style={{
+                                        padding: '12px',
+                                        borderRadius: '12px',
+                                        background: 'linear-gradient(135deg, #FF4444, #CC0000)',
+                                        color: '#FFF',
+                                        border: '2px solid #FF4444',
+                                        cursor: 'pointer',
+                                        boxShadow: '0 0 20px rgba(255,68,68,0.5)',
+                                        animation: 'pulse 1s infinite',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                >
+                                    <Square size={20} />
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={toggleVoiceRecognition}
+                                    disabled={loading}
+                                    style={{
+                                        padding: '12px',
+                                        borderRadius: '12px',
+                                        background: voiceState === 'listening' ? 'linear-gradient(135deg, #FF4444, #CC0000)' : 'rgba(0,229,176,0.2)',
+                                        color: voiceState === 'listening' ? '#FFF' : '#00E5B0',
+                                        border: voiceState === 'listening' ? '2px solid #FF4444' : '2px solid transparent',
+                                        cursor: 'pointer',
+                                        boxShadow: voiceState === 'listening' ? '0 0 20px rgba(255,68,68,0.5)' : 'none',
+                                        animation: voiceState === 'listening' ? 'pulse 1s infinite' : 'none',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                >
+                                    {voiceState === 'listening' ? <Mic size={20} /> : <MicOff size={20} />}
+                                </button>
+                            )}
                             <input
                                 type="text"
                                 value={input}
                                 onChange={e => setInput(e.target.value)}
-                                placeholder="Speak or type a command..."
+                                placeholder={voiceState === 'speaking' ? 'Jarvis is speaking... click ■ to stop' : 'Speak or type a command...'}
                                 disabled={loading || backendStatus === 'offline'}
                                 style={{ flex: 1, padding: '12px 16px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', fontSize: '13px', outline: 'none' }}
                             />

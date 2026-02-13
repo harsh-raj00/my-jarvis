@@ -64,3 +64,5 @@ backend/__pycache__/
 backend/uploads/
 backend/audio_files/
 backend/.env
+*.db
+jarvis.db

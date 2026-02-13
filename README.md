@@ -21,6 +21,7 @@
   <img src="https://img.shields.io/badge/FastAPI-0.109-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI"/>
   <img src="https://img.shields.io/badge/Gemini_AI-Latest-4285F4?style=flat-square&logo=google&logoColor=white" alt="Gemini"/>
   <img src="https://img.shields.io/badge/Voice_Enabled-SpeechAPI-FF4444?style=flat-square&logo=google-chrome&logoColor=white" alt="Voice"/>
+  <img src="https://img.shields.io/badge/WebSocket-Real--Time-FF6F00?style=flat-square&logo=socketdotio&logoColor=white" alt="WebSocket"/>
   <img src="https://img.shields.io/badge/License-MIT-00E5B0?style=flat-square" alt="MIT License"/>
 </p>
 
@@ -89,10 +90,10 @@ When you activate voice, a stunning **full-screen popup** appears:
 
 ### 🧠 AI Brain
 - Powered by **Google Gemini AI**
+- **ElevenLabs** voice synthesis (pyttsx3 fallback)
 - J.A.R.V.I.S. personality prompt
 - Context-aware responses
-- Plugin-based extensibility
-- Graceful fallback mode
+- 5 auto-discovered plugins
 
 </td>
 </tr>
@@ -109,12 +110,12 @@ When you activate voice, a stunning **full-screen popup** appears:
 </td>
 <td width="50%">
 
-### 📊 System Monitor
-- Real-time CPU, Memory, Disk tracking
-- Backend health monitoring
-- Connection status indicators
-- Auto-reconnecting WebSocket
-- Prometheus metrics ready
+### 📊 Real-Time Backend
+- WebSocket for live bidirectional chat
+- System metrics pushed every 3 seconds
+- Conversation history persistence (SQLite/MySQL)
+- Structured logging with request IDs
+- Rate limiting & security headers
 
 </td>
 </tr>
@@ -122,11 +123,11 @@ When you activate voice, a stunning **full-screen popup** appears:
 <td width="50%">
 
 ### 🔌 Plugin System
-- Hot-pluggable architecture
-- **System Plugin** — OS-level commands
+- **Auto-discovery** — drop a file, it loads
+- Priority-based message routing
+- Lifecycle hooks (on_load / on_unload)
+- **System Plugin** — OS-level diagnostics
 - **Weather Plugin** — Live weather data
-- Easy-to-build custom plugins
-- Async plugin processing
 
 </td>
 <td width="50%">
@@ -164,13 +165,14 @@ When you activate voice, a stunning **full-screen popup** appears:
 | Technology | Purpose |
 |:--|:--|
 | **FastAPI** | High-performance async API framework |
+| **WebSocket** | Real-time bidirectional communication |
 | **Google Gemini AI** | LLM for conversational intelligence |
-| **SQLAlchemy** + Alembic | Database ORM & migrations |
+| **SQLAlchemy** | ORM with MySQL + SQLite fallback |
 | **Pydantic** | Data validation & settings management |
 | **psutil** | System metrics collection |
-| **Prometheus Client** | Metrics & monitoring |
+| **Structlog** | Structured request/response logging |
 | **pyttsx3** | Server-side speech synthesis |
-| **Structlog** | Structured logging |
+| **Custom Middleware** | Rate limiting, security headers, error handling |
 
 <br>
 
@@ -262,19 +264,31 @@ jarvis-ai/
 │   │   └── styles/                 # Global CSS & design tokens
 │   └── vite.config.js
 │
-├── ⚙️ backend/                      # FastAPI Python server
+├── backend/                         # FastAPI Python server
 │   └── src/
-│       ├── api/v1/                 # Versioned REST endpoints
+│       ├── api/v1/                 # Versioned REST + WebSocket
+│       │   └── endpoints/
+│       │       ├── chat            # Chat + conversation history
+│       │       ├── websocket       # Real-time WebSocket endpoint
+│       │       ├── system          # Health & system metrics
+│       │       ├── speech          # STT / TTS
+│       │       ├── plugins         # Plugin management
+│       │       └── skills          # Skill listing
+│       ├── middleware/             # Custom middleware
+│       │   ├── error_handler       # Global exception handling
+│       │   ├── logging_config      # Structlog request logging
+│       │   ├── rate_limiter        # Token-bucket rate limiting
+│       │   └── security            # Security headers
 │       ├── services/
 │       │   ├── llm_service         # Gemini AI integration
 │       │   ├── speech_service      # Text-to-speech engine
-│       │   └── plugin_manager      # Plugin orchestrator
-│       ├── plugins/
-│       │   ├── system_plugin       # OS commands & diagnostics
-│       │   └── weather_plugin      # Weather data fetcher
+│       │   └── plugin_manager      # Auto-discovery plugin system
+│       ├── plugins/                # Drop-in plugin directory
+│       │   ├── system_plugin       # OS diagnostics (priority=10)
+│       │   └── weather_plugin      # Weather data (priority=5)
 │       ├── models/                 # SQLAlchemy models
 │       ├── config/                 # Settings & env management
-│       └── database/               # DB connection & sessions
+│       └── database/               # DB connection & CRUD
 │
 └── README.md
 ```
@@ -293,7 +307,12 @@ J.A.R.V.I.S. supports natural language voice interaction. Click the **microphone
 | *"Run system diagnostics"* | Returns CPU, memory, and disk status |
 | *"What time is it?"* | Responds with current time |
 | *"Tell me a joke"* | Generates a witty response via Gemini |
-| *"Who are you?"* | Classic J.A.R.V.I.S. introduction |
+| *"Turn on the lights"* | Controls smart home lights via plugin |
+| *"Set temperature to 72"* | Adjusts thermostat |
+| *"Check my inbox"* | Email plugin shows inbox summary |
+| *"Set reminder to call Pepper"* | Saves a reminder |
+| *"Show calendar"* | Displays calendar for current month |
+| *"Activate movie scene"* | Smart home scene activation |
 | Any natural question | Gemini AI processes and responds |
 
 > 💡 **Tip:** Voice recognition works best in **Google Chrome**. Make sure to allow microphone access when prompted.
@@ -304,27 +323,64 @@ J.A.R.V.I.S. supports natural language voice interaction. Click the **microphone
 
 ## 🔌 Plugin System
 
-Extend J.A.R.V.I.S. with custom plugins. Each plugin is a Python class that handles specific commands:
+Plugins are **auto-discovered** — just drop a `.py` file in `backend/src/plugins/` and it loads on startup:
 
 ```python
 from src.plugins.base_plugin import BasePlugin
 
 class MyPlugin(BasePlugin):
-    name = "my_plugin"
-    description = "Does something awesome"
+    def __init__(self):
+        super().__init__()
+        self.name = "MyPlugin"
+        self.description = "Does something awesome"
+        self.priority = 15  # Higher = checked first
+        self.commands = ["my command"]
     
     async def can_handle(self, message: str) -> bool:
         return "my command" in message.lower()
     
-    async def process(self, message: str) -> str:
+    async def handle(self, message: str, **kwargs) -> str:
         return "Plugin response here!"
+
+    def on_load(self):   # Optional lifecycle hook
+        print("Plugin loaded!")
 ```
 
 ### Built-in Plugins
-| Plugin | Description |
-|:--|:--|
-| 🖥️ **System** | CPU, memory, disk monitoring & OS commands |
-| 🌤️ **Weather** | Real-time weather data and forecasts |
+| Plugin | Priority | Description |
+|:--|:--|:--|
+| 🖥️ **System** | 10 | CPU, memory, disk monitoring & OS commands |
+| 📅 **Calendar** | 8 | Date, time, reminders, schedule management |
+| 🏠 **Smart Home** | 7 | Lights, thermostat, locks, security, scenes |
+| 📧 **Email** | 6 | Compose, inbox summary, draft management |
+| 🌤️ **Weather** | 5 | Real-time weather data and forecasts |
+
+<br>
+
+---
+
+## 🔄 WebSocket API
+
+Connect to `ws://localhost:8000/api/v1/ws` for real-time communication:
+
+```json
+// Send a chat message
+{ "type": "chat", "message": "Hello JARVIS", "session_id": "abc123" }
+
+// Server responds with
+{ "type": "chat_response", "data": { "response": "...", "session_id": "abc123" } }
+
+// Server pushes system metrics every 3s
+{ "type": "system_metrics", "data": { "cpu_usage": 12.5, "memory_usage": 45.2 } }
+```
+
+### Conversation History API
+| Endpoint | Method | Description |
+|:--|:--|:--|
+| `/api/v1/chat` | POST | Send message (auto-saved to DB) |
+| `/api/v1/chat/history` | GET | List recent conversations |
+| `/api/v1/chat/history/{session_id}` | GET | Session-specific history |
+| `/api/v1/chat/history/{session_id}` | DELETE | Clear session history |
 
 <br>
 
@@ -339,12 +395,17 @@ All config is managed via environment variables in `backend/.env`:
 GEMINI_API_KEY=your_key_here
 GEMINI_MODEL=gemini-3-flash-preview
 
-# Database
+# Database (SQLite fallback if MySQL unavailable)
 DATABASE_URL=mysql+mysqlconnector://root:pass@localhost:3306/jarvis_db
 
 # Security
 SECRET_KEY=your_secret_key
 ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Rate Limiting
+RATE_LIMIT_PER_MINUTE=60
+CHAT_RATE_LIMIT_PER_MINUTE=20
+MAX_REQUEST_SIZE_MB=1.0
 
 # Server
 HOST=0.0.0.0

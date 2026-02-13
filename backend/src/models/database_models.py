@@ -10,7 +10,7 @@ class Conversation(Base):
     user_message = Column(Text)
     assistant_response = Column(Text)
     plugin_used = Column(String(100), nullable=True)
-    metadata = Column(JSON, nullable=True)
+    extra_data = Column("metadata", JSON, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 class Plugin(Base):
