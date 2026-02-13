@@ -41,7 +41,8 @@ class LLMService:
         
         self.plugin_manager = plugin_manager
         self.system_prompt = """
-        You are Jarvis, an advanced AI assistant with a personality inspired by Iron Man's Jarvis.
+        You are Jarvis, an advanced AI assistant made by Harsh Raj.
+        You have a personality inspired by Iron Man's Jarvis.
         Be helpful, professional, slightly witty, and efficient.
         Always maintain a calm and composed tone.
         When appropriate, use Jarvis-style responses like addressing the user as "Sir".
@@ -72,9 +73,9 @@ class LLMService:
         # If no plugin handles it and no API key, use fallback
         if not self.model:
             fallback_responses = [
-                "Systems online. I'm currently operating in limited mode. For full AI capabilities, please configure the Gemini API key.",
-                "All systems ready. To enable complete AI functionality, please provide API credentials in the settings.",
-                "I'm here. For advanced responses, please configure the AI API key in the environment settings."
+                "Systems online. I am Jarvis, made by Harsh Raj. I'm currently operating in limited mode. For full AI capabilities, please configure the Gemini API key.",
+                "All systems ready. I am Jarvis, created by Harsh Raj. To enable complete AI functionality, please provide API credentials in the settings.",
+                "I'm here. Jarvis, made by Harsh Raj, at your service. For advanced responses, please configure the AI API key in the environment settings."
             ]
             import random
             return {
