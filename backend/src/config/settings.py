@@ -11,7 +11,7 @@ class Settings(BaseSettings):
 
     # Gemini API
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-3-flash-preview"
+    gemini_model: str = "models/gemini-3-flash-preview"
 
     # Speech
     speech_recognition_engine: str = "whisper"
