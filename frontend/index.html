@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🤖 J.A.R.V.I.S. | STARK INDUSTRIES</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --jarvis-teal: #00E5B0;
+      --jarvis-cyan: #00D4FF;
+      --jarvis-blue: #0088FF;
+      --arc-gold: #FFD700;
+      --stark-red: #FF3333;
+      --deep-black: #000000;
+      --space-black: #050510;
+      --starlight: #E6F1FF;
+    }
+
+    body {
+      background: var(--deep-black);
+      color: white;
+      font-family: 'Orbitron', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      position: relative;
+    }
+
+    /* Particle Canvas */
+    #particleCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Main Container */
+    .jarvis-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    /* J.A.R.V.I.S. Title */
+    .jarvis-title {
+      text-align: center;
+      margin-bottom: 40px;
+      z-index: 20;
+      position: relative;
+    }
+
+    .title-main {
+      font-size: 5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg,
+          var(--jarvis-teal) 0%,
+          var(--jarvis-cyan) 30%,
+          var(--jarvis-blue) 60%,
+          var(--jarvis-teal) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 12px;
+      margin-bottom: 15px;
+      text-shadow:
+        0 0 50px rgba(0, 229, 176, 0.6),
+        0 0 100px rgba(0, 229, 176, 0.3);
+      animation: jarvisGlow 3s ease-in-out infinite;
+    }
+
+    .title-sub {
+      font-size: 1.3rem;
+      color: var(--jarvis-teal);
+      letter-spacing: 20px;
+      text-transform: uppercase;
+      opacity: 0.9;
+      font-family: 'Rajdhani', sans-serif;
+      animation: subtitlePulse 2s ease-in-out infinite;
+    }
+
+    /* Arc Reactor Core */
+    .arc-reactor-core {
+      position: relative;
+      width: 350px;
+      height: 350px;
+      margin: 30px 0;
+      z-index: 15;
+    }
+
+    .reactor-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      height: 100%;
+      border: 3px solid rgba(0, 229, 176, 0.4);
+      border-radius: 50%;
+      animation: ringSpin 25s linear infinite;
+      box-shadow: 0 0 20px rgba(0, 229, 176, 0.3);
+    }
+
+    .reactor-ring::before {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: 50%;
+      width: 12px;
+      height: 12px;
+      background: var(--jarvis-teal);
+      border-radius: 50%;
+      box-shadow: 0 0 20px var(--jarvis-teal);
+    }
+
+    .reactor-ring:nth-child(2) {
+      width: 80%;
+      height: 80%;
+      border-color: rgba(0, 212, 255, 0.5);
+      animation: ringSpin 18s linear infinite reverse;
+      border-width: 2px;
+    }
+
+    .reactor-ring:nth-child(3) {
+      width: 60%;
+      height: 60%;
+      border-color: rgba(0, 136, 255, 0.4);
+      animation: ringSpin 30s linear infinite;
+      border-width: 2px;
+    }
+
+    .reactor-ring:nth-child(4) {
+      width: 40%;
+      height: 40%;
+      border-color: rgba(0, 229, 176, 0.5);
+      animation: ringSpin 12s linear infinite reverse;
+      border-width: 2px;
+    }
+
+    .reactor-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle,
+          #FFFFFF 0%,
+          var(--jarvis-teal) 25%,
+          var(--jarvis-cyan) 50%,
+          var(--jarvis-blue) 70%,
+          transparent 85%);
+      border-radius: 50%;
+      box-shadow:
+        0 0 60px var(--jarvis-teal),
+        0 0 120px var(--jarvis-cyan),
+        0 0 180px rgba(0, 136, 255, 0.4),
+        inset 0 0 30px rgba(255, 255, 255, 0.5);
+      animation: corePulse 2s ease-in-out infinite;
+    }
+
+    .reactor-center::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 0 40px white;
+    }
+
+    /* Module Nodes - orbiting around reactor */
+    .module-orbit {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      animation: moduleOrbit 40s linear infinite;
+    }
+
+    .module-node {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid;
+      box-shadow: 0 0 25px;
+    }
+
+    .module-node:hover {
+      transform: scale(1.3);
+      box-shadow: 0 0 50px;
+    }
+
+    .module-node.voice {
+      border-color: var(--jarvis-teal);
+      color: var(--jarvis-teal);
+      box-shadow: 0 0 25px var(--jarvis-teal);
+    }
+
+    .module-node.ai {
+      border-color: var(--jarvis-cyan);
+      color: var(--jarvis-cyan);
+      box-shadow: 0 0 25px var(--jarvis-cyan);
+    }
+
+    .module-node.system {
+      border-color: var(--jarvis-blue);
+      color: var(--jarvis-blue);
+      box-shadow: 0 0 25px var(--jarvis-blue);
+    }
+
+    .module-node.security {
+      border-color: var(--stark-red);
+      color: var(--stark-red);
+      box-shadow: 0 0 25px var(--stark-red);
+    }
+
+    .module-node.network {
+      border-color: var(--arc-gold);
+      color: var(--arc-gold);
+      box-shadow: 0 0 25px var(--arc-gold);
+    }
+
+    .module-node.power {
+      border-color: #AA66FF;
+      color: #AA66FF;
+      box-shadow: 0 0 25px #AA66FF;
+    }
+
+    /* Neural Terminal */
+    .neural-terminal {
+      position: absolute;
+      bottom: 60px;
+      width: 85%;
+      max-width: 900px;
+      height: 180px;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 229, 176, 0.4);
+      border-radius: 12px;
+      padding: 18px;
+      z-index: 20;
+      box-shadow:
+        0 0 50px rgba(0, 229, 176, 0.15),
+        inset 0 0 30px rgba(0, 229, 176, 0.05);
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0, 229, 176, 0.3);
+    }
+
+    .terminal-title {
+      font-size: 1rem;
+      color: var(--jarvis-teal);
+      letter-spacing: 4px;
+      margin-right: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .terminal-title i {
+      font-size: 0.9rem;
+    }
+
+    .terminal-status {
+      display: flex;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      animation: dotPulse 1.5s infinite;
+    }
+
+    .status-dot.green {
+      background: var(--jarvis-teal);
+    }
+
+    .status-dot.blue {
+      background: var(--jarvis-cyan);
+      animation-delay: 0.3s;
+    }
+
+    .status-dot.gold {
+      background: var(--arc-gold);
+      animation-delay: 0.6s;
+    }
+
+    .terminal-content {
+      height: 100px;
+      overflow-y: auto;
+      font-family: 'Rajdhani', monospace;
+      font-size: 0.85rem;
+      line-height: 1.7;
+    }
+
+    .terminal-line {
+      margin-bottom: 5px;
+      opacity: 0;
+      animation: lineAppear 0.4s ease forwards;
+    }
+
+    .terminal-prompt {
+      color: var(--jarvis-teal);
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .terminal-text {
+      color: var(--starlight);
+    }
+
+    .terminal-text.success {
+      color: #00FF88;
+    }
+
+    .terminal-text.warning {
+      color: var(--arc-gold);
+    }
+
+    .terminal-text.error {
+      color: var(--stark-red);
+    }
+
+    .terminal-text.info {
+      color: var(--jarvis-cyan);
+    }
+
+    /* Command Panel */
+    .command-panel {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      display: flex;
+      gap: 12px;
+      z-index: 30;
+    }
+
+    .command-btn {
+      padding: 12px 22px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid var(--jarvis-teal);
+      border-radius: 8px;
+      color: var(--jarvis-teal);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(10px);
+    }
+
+    .command-btn:hover {
+      background: rgba(0, 229, 176, 0.2);
+      box-shadow: 0 0 30px var(--jarvis-teal);
+      transform: translateY(-3px);
+    }
+
+    .command-btn.primary {
+      background: linear-gradient(135deg, var(--jarvis-teal), var(--jarvis-blue));
+      color: #000;
+      border: none;
+      font-weight: bold;
+    }
+
+    .command-btn.primary:hover {
+      box-shadow: 0 0 40px var(--jarvis-teal);
+    }
+
+    /* Status Bar */
+    .status-bar {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 30;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+
+    .status-icon {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--jarvis-teal);
+      box-shadow: 0 0 10px var(--jarvis-teal);
+      animation: statusBlink 2s infinite;
+    }
+
+    .status-icon.warning {
+      background: var(--arc-gold);
+      box-shadow: 0 0 10px var(--arc-gold);
+    }
+
+    .status-icon.error {
+      background: var(--stark-red);
+      box-shadow: 0 0 10px var(--stark-red);
+    }
+
+    /* Energy Beams */
+    .energy-beams {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .energy-beam {
+      position: absolute;
+      width: 2px;
+      height: 100vh;
+      background: linear-gradient(transparent, var(--jarvis-teal), transparent);
+      opacity: 0;
+      animation: beamScan 5s linear infinite;
+    }
+
+    /* Scan Lines Overlay */
+    .scan-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        repeating-linear-gradient(0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 229, 176, 0.02) 2px,
+          rgba(0, 229, 176, 0.02) 4px);
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* HUD Corners */
+    .hud-corner {
+      position: fixed;
+      width: 80px;
+      height: 80px;
+      border: 2px solid var(--jarvis-teal);
+      z-index: 50;
+      opacity: 0.6;
+    }
+
+    .hud-corner.top-left {
+      top: 15px;
+      left: 15px;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .hud-corner.top-right {
+      top: 15px;
+      right: 15px;
+      border-left: none;
+      border-bottom: none;
+    }
+
+    .hud-corner.bottom-left {
+      bottom: 15px;
+      left: 15px;
+      border-right: none;
+      border-top: none;
+    }
+
+    .hud-corner.bottom-right {
+      bottom: 15px;
+      right: 15px;
+      border-left: none;
+      border-top: none;
+    }
+
+    /* Animations */
+    @keyframes jarvisGlow {
+
+      0%,
+      100% {
+        filter: brightness(1) drop-shadow(0 0 40px rgba(0, 229, 176, 0.6));
+      }
+
+      50% {
+        filter: brightness(1.2) drop-shadow(0 0 80px rgba(0, 229, 176, 0.9));
+      }
+    }
+
+    @keyframes subtitlePulse {
+
+      0%,
+      100% {
+        opacity: 0.7;
+        letter-spacing: 20px;
+      }
+
+      50% {
+        opacity: 1;
+        letter-spacing: 22px;
+      }
+    }
+
+    @keyframes ringSpin {
+      from {
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+
+      to {
+        transform: translate(-50%, -50%) rotate(360deg);
+      }
+    }
+
+    @keyframes corePulse {
+
+      0%,
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        box-shadow:
+          0 0 60px var(--jarvis-teal),
+          0 0 120px var(--jarvis-cyan),
+          0 0 180px rgba(0, 136, 255, 0.4);
+      }
+
+      50% {
+        transform: translate(-50%, -50%) scale(1.08);
+        box-shadow:
+          0 0 80px var(--jarvis-teal),
+          0 0 160px var(--jarvis-cyan),
+          0 0 240px rgba(0, 136, 255, 0.5);
+      }
+    }
+
+    @keyframes moduleOrbit {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes dotPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.3);
+        opacity: 0.7;
+      }
+    }
+
+    @keyframes lineAppear {
+      from {
+        opacity: 0;
+        transform: translateX(-15px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes beamScan {
+      0% {
+        opacity: 0;
+        transform: translateX(-100vw);
+      }
+
+      10%,
+      90% {
+        opacity: 0.6;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateX(100vw);
+      }
+    }
+
+    @keyframes statusBlink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    /* Scrollbar */
+    .terminal-content::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .terminal-content::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 3px;
+    }
+
+    .terminal-content::-webkit-scrollbar-thumb {
+      background: linear-gradient(var(--jarvis-teal), var(--jarvis-blue));
+      border-radius: 3px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .title-main {
+        font-size: 2.8rem;
+        letter-spacing: 6px;
+      }
+
+      .title-sub {
+        font-size: 0.9rem;
+        letter-spacing: 10px;
+      }
+
+      .arc-reactor-core {
+        width: 260px;
+        height: 260px;
+      }
+
+      .reactor-center {
+        width: 80px;
+        height: 80px;
+      }
+
+      .command-panel {
+        top: 15px;
+        right: 15px;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .command-btn {
+        padding: 10px 15px;
+        font-size: 0.75rem;
+      }
+
+      .module-node {
+        width: 45px;
+        height: 45px;
+        font-size: 1rem;
+      }
+
+      .neural-terminal {
+        height: 140px;
+        bottom: 40px;
+      }
+
+      .status-bar {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Particle Canvas -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- Effects -->
+  <div class="scan-overlay"></div>
+  <div class="energy-beams" id="energyBeams"></div>
+
+  <!-- HUD Corners -->
+  <div class="hud-corner top-left"></div>
+  <div class="hud-corner top-right"></div>
+  <div class="hud-corner bottom-left"></div>
+  <div class="hud-corner bottom-right"></div>
+
+  <!-- Main Container -->
+  <div class="jarvis-container">
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="status-item">
+        <div class="status-icon"></div>
+        <span>NEURAL CORE: ACTIVE</span>
+      </div>
+      <div class="status-item">
+        <div class="status-icon"></div>
+        <span>VOICE MODULE: READY</span>
+      </div>
+      <div class="status-item">
+        <div class="status-icon warning"></div>
+        <span>AI SYNC: CONNECTING</span>
+      </div>
+      <div class="status-item">
+        <div class="status-icon"></div>
+        <span>SECURITY: ENABLED</span>
+      </div>
+    </div>
+
+    <!-- Command Panel -->
+    <div class="command-panel">
+      <div class="command-btn" id="diagnosticsBtn">
+        <i class="fas fa-stethoscope"></i>
+        DIAGNOSTICS
+      </div>
+      <div class="command-btn primary" id="initializeBtn">
+        <i class="fas fa-play"></i>
+        INITIALIZE
+      </div>
+      <div class="command-btn" id="protocolBtn">
+        <i class="fas fa-shield-alt"></i>
+        PROTOCOLS
+      </div>
+    </div>
+
+    <!-- J.A.R.V.I.S. Title -->
+    <div class="jarvis-title">
+      <div class="title-main">J.A.R.V.I.S.</div>
+      <div class="title-sub">STARK INDUSTRIES AI INTERFACE</div>
+    </div>
+
+    <!-- Arc Reactor Core -->
+    <div class="arc-reactor-core">
+      <div class="reactor-ring"></div>
+      <div class="reactor-ring"></div>
+      <div class="reactor-ring"></div>
+      <div class="reactor-ring"></div>
+      <div class="reactor-center"></div>
+
+      <!-- Module Nodes -->
+      <div class="module-orbit">
+        <div class="module-node voice" data-module="voice"
+          style="transform: rotate(0deg) translateX(160px) rotate(0deg);">
+          <i class="fas fa-microphone"></i>
+        </div>
+        <div class="module-node ai" data-module="ai" style="transform: rotate(60deg) translateX(160px) rotate(-60deg);">
+          <i class="fas fa-brain"></i>
+        </div>
+        <div class="module-node system" data-module="system"
+          style="transform: rotate(120deg) translateX(160px) rotate(-120deg);">
+          <i class="fas fa-server"></i>
+        </div>
+        <div class="module-node security" data-module="security"
+          style="transform: rotate(180deg) translateX(160px) rotate(-180deg);">
+          <i class="fas fa-lock"></i>
+        </div>
+        <div class="module-node network" data-module="network"
+          style="transform: rotate(240deg) translateX(160px) rotate(-240deg);">
+          <i class="fas fa-wifi"></i>
+        </div>
+        <div class="module-node power" data-module="power"
+          style="transform: rotate(300deg) translateX(160px) rotate(-300deg);">
+          <i class="fas fa-bolt"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Neural Terminal -->
+    <div class="neural-terminal">
+      <div class="terminal-header">
+        <div class="terminal-title">
+          <i class="fas fa-terminal"></i>
+          NEURAL INTERFACE CONSOLE
+        </div>
+        <div class="terminal-status">
+          <div class="status-dot green"></div>
+          <div class="status-dot blue"></div>
+          <div class="status-dot gold"></div>
+        </div>
+      </div>
+      <div class="terminal-content" id="terminalContent">
+        <!-- Terminal lines will be added here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- React App Root -->
+  <div id="root"></div>
+
+  <script type="module" src="/src/index.jsx"></script>
+  <script>
+    // ===== PARTICLE SYSTEM =====
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.speedY = (Math.random() - 0.5) * 0.5;
+        this.brightness = Math.random() * 0.5 + 0.5;
+        this.hue = Math.random() > 0.5 ? 160 : 190; // Teal or Cyan
+        this.pulseSpeed = Math.random() * 0.02 + 0.01;
+        this.pulseOffset = Math.random() * Math.PI * 2;
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        // Wrap around screen
+        if (this.x < 0) this.x = canvas.width;
+        if (this.x > canvas.width) this.x = 0;
+        if (this.y < 0) this.y = canvas.height;
+        if (this.y > canvas.height) this.y = 0;
+
+        // Pulse effect
+        this.brightness = 0.5 + Math.sin(Date.now() * this.pulseSpeed + this.pulseOffset) * 0.3;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${this.hue}, 100%, 70%, ${this.brightness})`;
+        ctx.fill();
+
+        // Glow
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${this.hue}, 100%, 50%, ${this.brightness * 0.15})`;
+        ctx.fill();
+      }
+    }
+
+    // Create particles
+    const particles = [];
+    const particleCount = 300;
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+
+    // Draw connections between nearby particles
+    function drawConnections() {
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 100) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            const opacity = (1 - distance / 100) * 0.15;
+            ctx.strokeStyle = `rgba(0, 229, 176, ${opacity})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function animateParticles() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      drawConnections();
+
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+
+      requestAnimationFrame(animateParticles);
+    }
+
+    animateParticles();
+
+    // ===== ENERGY BEAMS =====
+    function createEnergyBeams() {
+      const container = document.getElementById('energyBeams');
+
+      setInterval(() => {
+        if (Math.random() > 0.7) {
+          const beam = document.createElement('div');
+          beam.className = 'energy-beam';
+          beam.style.left = `${Math.random() * 100}vw`;
+          beam.style.animationDuration = `${Math.random() * 3 + 3}s`;
+          container.appendChild(beam);
+
+          setTimeout(() => beam.remove(), 6000);
+        }
+      }, 2000);
+    }
+
+    // ===== TERMINAL SYSTEM =====
+    function initTerminal() {
+      const terminal = document.getElementById('terminalContent');
+      const messages = [
+        { text: 'Initializing J.A.R.V.I.S. Neural Core...', delay: 0 },
+        { text: 'Neural pathways: CONNECTED', type: 'success', delay: 400 },
+        { text: 'Loading Stark Industries protocols...', delay: 800 },
+        { text: 'Voice recognition module: ACTIVE', type: 'success', delay: 1200 },
+        { text: 'Natural language processing: ONLINE', type: 'success', delay: 1600 },
+        { text: 'Gemini AI integration: SYNCING', type: 'warning', delay: 2000 },
+        { text: 'Security protocols: ENGAGED', type: 'success', delay: 2400 },
+        { text: 'System diagnostics: ALL GREEN', type: 'success', delay: 2800 },
+        { text: 'Holographic display: CALIBRATED', type: 'success', delay: 3200 },
+        { text: 'Awaiting voice command, Sir.', type: 'info', delay: 3600 }
+      ];
+
+      messages.forEach((msg, index) => {
+        setTimeout(() => {
+          const line = document.createElement('div');
+          line.className = 'terminal-line';
+          line.style.animationDelay = `${index * 0.05}s`;
+
+          const prompt = document.createElement('span');
+          prompt.className = 'terminal-prompt';
+          prompt.textContent = 'J.A.R.V.I.S>';
+
+          const text = document.createElement('span');
+          text.className = `terminal-text ${msg.type || ''}`;
+          text.textContent = msg.text;
+
+          line.appendChild(prompt);
+          line.appendChild(text);
+          terminal.appendChild(line);
+
+          terminal.scrollTop = terminal.scrollHeight;
+        }, msg.delay);
+      });
+    }
+
+    // ===== MODULE INTERACTIONS =====
+    function initModuleInteractions() {
+      const nodes = document.querySelectorAll('.module-node');
+      const terminal = document.getElementById('terminalContent');
+
+      const moduleData = {
+        'voice': { name: 'VOICE MODULE', status: 'Speech recognition active - Ready for input' },
+        'ai': { name: 'AI CORE', status: 'Gemini neural network synchronized' },
+        'system': { name: 'SYSTEM', status: 'All subsystems operating normally' },
+        'security': { name: 'SECURITY', status: 'Encryption protocols active - Access verified' },
+        'network': { name: 'NETWORK', status: 'Connected to Stark Industries servers' },
+        'power': { name: 'POWER', status: 'Arc Reactor output: 100% capacity' }
+      };
+
+      nodes.forEach(node => {
+        node.addEventListener('click', () => {
+          const module = node.dataset.module;
+          const data = moduleData[module];
+
+          const line = document.createElement('div');
+          line.className = 'terminal-line';
+
+          const prompt = document.createElement('span');
+          prompt.className = 'terminal-prompt';
+          prompt.textContent = `${data.name}>`;
+
+          const text = document.createElement('span');
+          text.className = 'terminal-text info';
+          text.textContent = data.status;
+
+          line.appendChild(prompt);
+          line.appendChild(text);
+          terminal.appendChild(line);
+          terminal.scrollTop = terminal.scrollHeight;
+
+          // Visual feedback
+          node.style.transform += ' scale(1.4)';
+          setTimeout(() => {
+            node.style.transform = node.style.transform.replace(' scale(1.4)', '');
+          }, 300);
+        });
+      });
+    }
+
+    // ===== BUTTON INTERACTIONS =====
+    function initButtonInteractions() {
+      const initBtn = document.getElementById('initializeBtn');
+      const diagBtn = document.getElementById('diagnosticsBtn');
+      const protoBtn = document.getElementById('protocolBtn');
+      const terminal = document.getElementById('terminalContent');
+
+      initBtn.addEventListener('click', () => {
+        const line = document.createElement('div');
+        line.className = 'terminal-line';
+
+        const prompt = document.createElement('span');
+        prompt.className = 'terminal-prompt';
+        prompt.textContent = 'SYSTEM>';
+
+        const text = document.createElement('span');
+        text.className = 'terminal-text success';
+        text.textContent = 'Launching J.A.R.V.I.S. interface... Welcome, Sir.';
+
+        line.appendChild(prompt);
+        line.appendChild(text);
+        terminal.appendChild(line);
+        terminal.scrollTop = terminal.scrollHeight;
+
+        // Core pulse effect
+        document.querySelector('.reactor-center').style.animation = 'none';
+        setTimeout(() => {
+          document.querySelector('.reactor-center').style.animation = 'corePulse 2s ease-in-out infinite';
+        }, 10);
+      });
+
+      diagBtn.addEventListener('click', () => {
+        const diagnostics = [
+          { text: 'Running full system diagnostics...', type: '', delay: 0 },
+          { text: 'CPU: 12% | Memory: 34% | Network: 98ms', type: 'info', delay: 500 },
+          { text: 'All systems nominal.', type: 'success', delay: 1000 }
+        ];
+
+        diagnostics.forEach(msg => {
+          setTimeout(() => {
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+
+            const prompt = document.createElement('span');
+            prompt.className = 'terminal-prompt';
+            prompt.textContent = 'DIAG>';
+
+            const text = document.createElement('span');
+            text.className = `terminal-text ${msg.type}`;
+            text.textContent = msg.text;
+
+            line.appendChild(prompt);
+            line.appendChild(text);
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+          }, msg.delay);
+        });
+      });
+
+      protoBtn.addEventListener('click', () => {
+        const line = document.createElement('div');
+        line.className = 'terminal-line';
+
+        const prompt = document.createElement('span');
+        prompt.className = 'terminal-prompt';
+        prompt.textContent = 'PROTOCOL>';
+
+        const text = document.createElement('span');
+        text.className = 'terminal-text warning';
+        text.textContent = 'Security protocols: MARK VII engaged. Biometric lock active.';
+
+        line.appendChild(prompt);
+        line.appendChild(text);
+        terminal.appendChild(line);
+        terminal.scrollTop = terminal.scrollHeight;
+      });
+    }
+
+    // ===== HIDE LOADING WHEN REACT LOADS =====
+    function hideLoadingScreen() {
+      const container = document.querySelector('.jarvis-container');
+      const corners = document.querySelectorAll('.hud-corner');
+      const scanOverlay = document.querySelector('.scan-overlay');
+      const canvas = document.getElementById('particleCanvas');
+
+      if (container) container.style.display = 'none';
+      corners.forEach(c => c.style.display = 'none');
+      if (scanOverlay) scanOverlay.style.display = 'none';
+      if (canvas) canvas.style.display = 'none';
+    }
+
+    // Listen for React app ready
+    window.addEventListener('react-app-ready', hideLoadingScreen);
+
+    // Also hide after timeout as fallback
+    setTimeout(() => {
+      const root = document.getElementById('root');
+      if (root && root.children.length > 0) {
+        hideLoadingScreen();
+      }
+    }, 5000);
+
+    // ===== INITIALIZE =====
+    function initializeExperience() {
+      createEnergyBeams();
+      initTerminal();
+      initModuleInteractions();
+      initButtonInteractions();
+
+      window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeExperience);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,287 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --jarvis-blue: 207 90% 54%;
+    --jarvis-cyan: 187 100% 42%;
+    --jarvis-purple: 271 81% 56%;
+    --jarvis-pink: 330 100% 50%;
+    --jarvis-green: 142 76% 36%;
+    --jarvis-red: 0 84% 60%;
+    --jarvis-yellow: 45 93% 58%;
+    --jarvis-gray: 215 25% 27%;
+    
+    /* Iron Man Theme Colors */
+    --im-gold: 45 100% 50%;
+    --im-red: 0 85% 50%;
+    --im-dark: 220 60% 5%;
+    --im-glow: 195 100% 50%;
+    
+    /* Glass morphism */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: 12px;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: 'JetBrains Mono', monospace;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-black text-white overflow-hidden;
+  }
+
+  #root {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-900/50;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gradient-to-b from-blue-500 to-cyan-400 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gradient-to-b from-blue-600 to-cyan-500;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-blue-500/30 text-white;
+  }
+
+  /* Focus Styles */
+  :focus-visible {
+    @apply outline-2 outline-blue-500 outline-offset-2;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', sans-serif;
+    @apply font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply backdrop-blur-md bg-white/5 border border-white/10;
+  }
+
+  .glass-card {
+    @apply backdrop-blur-lg bg-gradient-to-br from-white/10 to-white/5 border border-white/20 rounded-2xl;
+  }
+
+  .neon-border {
+    @apply border-2 border-transparent;
+    background: linear-gradient(45deg, #3b82f6, #06b6d4, #9d4edd, #ff00ff) border-box;
+    mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+  }
+
+  .hologram-effect {
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba(59, 130, 246, 0.1) 50%,
+      transparent 70%
+    );
+    animation: hologram-shimmer 3s ease-in-out infinite;
+  }
+
+  .terminal-text {
+    font-family: 'JetBrains Mono', monospace;
+    @apply text-green-400;
+    text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+  }
+
+  .data-stream {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .data-stream::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to bottom right,
+      transparent 30%,
+      rgba(14, 165, 233, 0.1) 50%,
+      transparent 70%
+    );
+    animation: stream 3s linear infinite;
+    transform: rotate(45deg);
+  }
+
+  .pulse-ring {
+    @apply absolute inset-0 rounded-full border-2 border-blue-500;
+    animation: ripple 1.5s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent;
+    background-size: 200% auto;
+    animation: gradient 3s ease infinite;
+  }
+
+  .icon-glow {
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+
+  .cyber-grid {
+    background-image: 
+      linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  .matrix-rain {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(34, 197, 94, 0.1) 2%,
+      rgba(34, 197, 94, 0.05) 4%,
+      transparent 8%
+    );
+    background-size: 100% 8px;
+    animation: scan 2s linear infinite;
+  }
+}
+
+@layer utilities {
+  .animate-hologram {
+    animation: hologram-shimmer 3s ease-in-out infinite;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .animate-wave {
+    animation: wave 2s ease-in-out infinite;
+  }
+
+  .animate-orbit {
+    animation: orbit 20s linear infinite;
+  }
+
+  .animate-ripple {
+    animation: ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@keyframes hologram-shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes stream {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
+@keyframes gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+    opacity: 1;
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.8);
+    opacity: 0.8;
+  }
+}
+
+@keyframes scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes wave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  75% { transform: rotate(-5deg); }
+}
+
+@keyframes orbit {
+  0% { transform: rotate(0deg) translateX(100px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .jarvis-app {
+    font-size: 14px;
+  }
+  
+  .glass-card {
+    @apply rounded-xl;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .jarvis-app * {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .glass-panel {
+    background: white !important;
+    border: 1px solid #ccc !important;
+  }
+}

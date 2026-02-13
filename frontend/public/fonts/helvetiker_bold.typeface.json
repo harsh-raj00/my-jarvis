@@ -1,0 +1,20 @@
+{
+  "glyphs": {
+    " ": {"x": 0, "y": 0, "width": 0, "height": 0, "xoffset": 0, "yoffset": 0, "xadvance": 32},
+    "J": {"x": 0, "y": 0, "width": 512, "height": 512, "xoffset": 0, "yoffset": 0, "xadvance": 512},
+    "A": {"x": 512, "y": 0, "width": 512, "height": 512, "xoffset": 0, "yoffset": 0, "xadvance": 512},
+    "R": {"x": 1024, "y": 0, "width": 512, "height": 512, "xoffset": 0, "yoffset": 0, "xadvance": 512},
+    "V": {"x": 1536, "y": 0, "width": 512, "height": 512, "xoffset": 0, "yoffset": 0, "xadvance": 512},
+    "I": {"x": 2048, "y": 0, "width": 256, "height": 512, "xoffset": 128, "yoffset": 0, "xadvance": 512},
+    "S": {"x": 2304, "y": 0, "width": 512, "height": 512, "xoffset": 0, "yoffset": 0, "xadvance": 512},
+    ".": {"x": 2816, "y": 0, "width": 128, "height": 128, "xoffset": 192, "yoffset": 384, "xadvance": 512}
+  },
+  "familyName": "Helvetiker",
+  "ascender": 896,
+  "descender": -256,
+  "underlinePosition": -64,
+  "underlineThickness": 64,
+  "boundingBox": {"xMin": 0, "xMax": 1024, "yMin": -256, "yMax": 896},
+  "resolution": 1000,
+  "originalFont": "helvetiker bold"
+}
