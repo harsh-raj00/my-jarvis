@@ -14,11 +14,11 @@ class LLMService:
                 genai.configure(api_key=self.gemini_api_key)
                 # Try model from settings first, then fallback options
                 model_options = [
-                    getattr(settings, 'gemini_model', 'gemini-1.5-flash'),
+                    getattr(settings, 'gemini_model', 'models/gemini-3-flash-preview'),
+                    'models/gemini-3-flash-preview',
+                    'models/gemini-2.0-flash',
                     'gemini-1.5-flash',
                     'gemini-1.5-pro', 
-                    'gemini-pro',
-                    'models/gemini-1.5-flash'
                 ]
                 
                 for model_name in model_options:
@@ -27,7 +27,7 @@ class LLMService:
                         print(f"Gemini AI initialized with model: {model_name}")
                         break
                     except Exception as e:
-                        print(f"Model {model_name} failed: {e}")
+                        print(f"[ERROR] Model {model_name} failed to initialize: {e}")
                         continue
                         
                 if not self.model:
