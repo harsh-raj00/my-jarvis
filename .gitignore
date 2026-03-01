@@ -60,6 +60,9 @@ frontend/dist/
 frontend/.env.local
 frontend/FRONTEND_FIXES.md
 
+# Documentation
+DEPLOYMENT.md
+
 # Backend
 backend/__pycache__/
 backend/uploads/
