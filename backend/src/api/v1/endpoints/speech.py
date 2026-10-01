@@ -1,9 +1,10 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 import base64
 from src.models.schemas import SpeechRequest, SpeechResponse
 from src.services.speech_service import speech_service
+from src.core.dependencies import verify_api_key
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(verify_api_key)])
 
 
 @router.post("/speech-to-text", response_model=SpeechResponse)
